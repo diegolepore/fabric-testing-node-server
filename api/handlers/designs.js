@@ -39,15 +39,15 @@ async function saveJSONCanvas(req, res) {
     //     }
     // })
 
-    if(emailData.length === 0) {
-      const jsonAddedRes = await db.collection('designs').add({ 
-        jsonString
-      })
-      res.status(201)
-      res.json(jsonAddedRes)
-    } else {
-      throw new Error({ exists: true })
-    }
+    // if(emailData.length === 0) {
+    const jsonAddedRes = await db.collection('designs').add({ 
+      jsonString
+    })
+    res.status(201)
+    res.json(jsonAddedRes)
+    // } else {
+    //   throw new Error({ exists: true })
+    // }
   } catch (error) {
     res.status(400)
     res.json(error)
@@ -55,8 +55,8 @@ async function saveJSONCanvas(req, res) {
 }
 
 const designRoutes = (app) => {
-  app.post('/designs', saveEmailAddress)
-  app.post('/designs', saveEmailAddress)
+  app.post('/designs', saveJSONCanvas)
+  // app.get('/designs/:id', getJSONCanvas)
 }
 
 module.exports = designRoutes
