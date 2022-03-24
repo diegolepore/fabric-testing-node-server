@@ -26,28 +26,55 @@ function configFirebase() {
 }
 
 async function saveJSONCanvas(req, res) {
-  configFirebase()
   try {     
     
-    const jsonString = req.body.jsonString
+    // console.log(JSON.stringify(req.body))
+    // const jsonString = req.body.jsonString
+    const jsonString = JSON.stringify(req.body)
     const db = getFirestore() 
-    // const querySnapshot = await db.collection('designs').where('email', "==", email).get()
-    // const emailData = querySnapshot.docs.map(doc => {
-    //     return {
-    //         uuid: doc.id,
-    //         ...doc.data()
-    //     }
-    // })
-
-    // if(emailData.length === 0) {
     const jsonAddedRes = await db.collection('designs').add({ 
       jsonString
     })
     res.status(201)
     res.json(jsonAddedRes)
-    // } else {
-    //   throw new Error({ exists: true })
-    // }
+  } catch (error) {
+    res.status(400)
+    res.json(error)
+  }
+}
+
+async function updateJSONCanvasString(req, res) {
+  try {     
+    const id = req.params.id
+    const db = getFirestore() 
+    const designRef = db.collection('designs').doc(id);
+    // console.log(designRef)
+    // Set the 'capital' field of the city
+    const jsonString = JSON.stringify(req.body)
+    const res = await designRef.update({ jsonString });
+    res.status(201)
+    res.json(res)
+  } catch (error) {
+    res.status(400)
+    res.json(error)
+  }
+}
+
+async function getJSONCanvasString(req, res) {
+  try {
+    const id = req.params.id
+    const db = getFirestore() 
+    const designRef = await db.collection('designs').doc(id)
+    // console.log(designRef)
+    const doc = await designRef.get();
+    if (!doc.exists) {
+      res.status(404)
+      res.json('No such document!')
+    } else {
+      // console.log('Document data:', doc.data());
+      res.status(200)
+      res.json(doc.data())
+    }
   } catch (error) {
     res.status(400)
     res.json(error)
@@ -55,8 +82,10 @@ async function saveJSONCanvas(req, res) {
 }
 
 const designRoutes = (app) => {
+  configFirebase()
   app.post('/designs', saveJSONCanvas)
-  // app.get('/designs/:id', getJSONCanvas)
+  app.get('/designs/:id', getJSONCanvasString)
+  app.put('/designs/:id', updateJSONCanvasString)
 }
 
 module.exports = designRoutes
